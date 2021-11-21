@@ -136,5 +136,5 @@ func run() error {
 		fmt.Println(n.Name)
 	}
 
-	return calculate(cfg, sets.NewString("kubedb.com"))
+	return calculate(c, sets.NewString("kubedb.com"))
 }

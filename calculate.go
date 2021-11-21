@@ -9,16 +9,13 @@ import (
 
 	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/meta"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/util/sets"
-	"k8s.io/client-go/dynamic"
-	"k8s.io/client-go/rest"
+	cu "kmodules.xyz/client-go/client"
 	resourcemetrics "kmodules.xyz/resource-metrics"
 	"kmodules.xyz/resource-metrics/api"
-	"kubedb.dev/apimachinery/apis/kubedb"
-	"sigs.k8s.io/controller-runtime/pkg/client/apiutil"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 type Stats struct {
@@ -26,25 +23,8 @@ type Stats struct {
 	Resources core.ResourceList
 }
 
-func calculate(cfg *rest.Config, apiGroups sets.String) error {
-	client, err := dynamic.NewForConfig(cfg)
-	if err != nil {
-		return err
-	}
-	mapper, err := apiutil.NewDynamicRESTMapper(cfg)
-	if err != nil {
-		return err
-	}
-
-	ns, err := client.Resource(schema.GroupVersionResource{
-		Group:    "",
-		Version:  "v1",
-		Resource: "namespaces",
-	}).Get(context.TODO(), "kube-system", metav1.GetOptions{})
-	if err != nil {
-		return err
-	}
-	clusterID, _, err := unstructured.NestedString(ns.UnstructuredContent(), "metadata", "uid")
+func calculate(c client.Client, apiGroups sets.String) error {
+	clusterID, err := cu.ClusterUID(c)
 	if err != nil {
 		return err
 	}
@@ -59,51 +39,35 @@ func calculate(cfg *rest.Config, apiGroups sets.String) error {
 			continue
 		}
 
-		var mapping *meta.RESTMapping
-		if gvk.Group == kubedb.GroupName {
-			mapping, err = mapper.RESTMapping(gvk.GroupKind())
-			if meta.IsNoMatchError(err) {
-				rsmap[gvk] = Stats{} // keep track
-				continue
-			} else if err != nil {
-				return err
-			}
-			gvk = mapping.GroupVersionKind // v1alpha1 or v1alpha2
-		} else {
-			mapping, err = mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
-			if meta.IsNoMatchError(err) {
-				rsmap[gvk] = Stats{} // keep track
-				continue
-			} else if err != nil {
-				return err
-			}
+		_, err := c.RESTMapper().RESTMapping(gvk.GroupKind(), gvk.Version)
+		if meta.IsNoMatchError(err) {
+			rsmap[gvk] = Stats{} // keep track
+			continue
+		} else if err != nil {
+			return err
 		}
 
-		var ri dynamic.ResourceInterface
-		if mapping.Scope == meta.RESTScopeNamespace {
-			ri = client.Resource(mapping.Resource).Namespace(core.NamespaceAll)
-		} else {
-			ri = client.Resource(mapping.Resource)
-		}
-		if result, err := ri.List(context.TODO(), metav1.ListOptions{}); err != nil {
+		var result unstructured.UnstructuredList
+		result.SetGroupVersionKind(gvk)
+		if err := c.List(context.TODO(), &result); err != nil {
 			return err
-		} else {
-			var summary core.ResourceList
-			for _, item := range result.Items {
-				content := item.UnstructuredContent()
-				rr, err := resourcemetrics.AppResourceLimits(content)
-				if err != nil {
-					return err
-				}
-				summary = api.AddResourceList(summary, rr)
-			}
-			rsmap[gvk] = Stats{
-				Count:     len(result.Items),
-				Resources: summary,
-			}
-			totalCount += len(result.Items)
-			rrTotal = api.AddResourceList(rrTotal, summary)
 		}
+
+		var summary core.ResourceList
+		for _, item := range result.Items {
+			content := item.UnstructuredContent()
+			rr, err := resourcemetrics.AppResourceLimits(content)
+			if err != nil {
+				return err
+			}
+			summary = api.AddResourceList(summary, rr)
+		}
+		rsmap[gvk] = Stats{
+			Count:     len(result.Items),
+			Resources: summary,
+		}
+		totalCount += len(result.Items)
+		rrTotal = api.AddResourceList(rrTotal, summary)
 	}
 
 	gvks := make([]schema.GroupVersionKind, 0, len(rsmap))
