@@ -68,9 +68,9 @@ func main() {
 
 	fmt.Println(GetAPIGroups(s).List())
 
-	//if err := run(); err != nil {
-	//	panic(err)
-	//}
+	if err := run(); err != nil {
+		panic(err)
+	}
 }
 
 func GetAPIGroups(s labels.Selector) sets.String {
