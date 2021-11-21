@@ -12,6 +12,7 @@ type ResourceSummarySpec struct {
 	Kind          string
 	TotalResource core.ResourceRequirements
 	AppResource   core.ResourceRequirements
+	Count         int
 }
 
 type KubernetesInfo struct {

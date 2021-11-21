@@ -23,9 +23,9 @@ type GenericResource struct {
 }
 
 type GenericResourceSpec struct {
-	APIGroup   string
-	APIVersion string
-	Kind       string
+	Group   string
+	Version string
+	Kind    string
 
 	Replicas     int64
 	RoleReplicas ReplicaList

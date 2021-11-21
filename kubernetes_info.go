@@ -10,24 +10,18 @@ import (
 	"k8s.io/client-go/rest"
 	meta_util "kmodules.xyz/client-go/meta"
 	"kmodules.xyz/client-go/tools/clusterid"
-	auditorapi "kmodules.xyz/custom-resources/apis/auditor/v1alpha1"
 )
 
-func GetSiteInfo(cfg *rest.Config, kc kubernetes.Interface) (*auditorapi.SiteInfo, error) {
-	si := auditorapi.SiteInfo{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: auditorapi.SchemeGroupVersion.String(),
-			Kind:       "SiteInfo",
-		},
-	}
+func GetKubernetesInfo(cfg *rest.Config, kc kubernetes.Interface) (*KubernetesInfo, error) {
+	var si KubernetesInfo
 
 	var err error
-	si.Kubernetes.ClusterName = clusterid.ClusterName()
-	si.Kubernetes.ClusterUID, err = clusterid.ClusterUID(kc.CoreV1().Namespaces())
+	si.ClusterName = clusterid.ClusterName()
+	si.ClusterUID, err = clusterid.ClusterUID(kc.CoreV1().Namespaces())
 	if err != nil {
 		return nil, err
 	}
-	si.Kubernetes.Version, err = kc.Discovery().ServerVersion()
+	si.Version, err = kc.Discovery().ServerVersion()
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +30,7 @@ func GetSiteInfo(cfg *rest.Config, kc kubernetes.Interface) (*auditorapi.SiteInf
 	if err != nil {
 		return nil, err
 	} else {
-		si.Kubernetes.ControlPlane = &auditorapi.ControlPlaneInfo{
+		si.ControlPlane = &ControlPlaneInfo{
 			NotBefore: metav1.NewTime(cert.NotBefore),
 			NotAfter:  metav1.NewTime(cert.NotAfter),
 			// DNSNames:       cert.DNSNames,
@@ -67,20 +61,20 @@ func GetSiteInfo(cfg *rest.Config, kc kubernetes.Interface) (*auditorapi.SiteInf
 				dnsNames.Delete(host)
 			}
 		}
-		si.Kubernetes.ControlPlane.DNSNames = dnsNames.List()
+		si.ControlPlane.DNSNames = dnsNames.List()
 
 		for _, ip := range cert.IPAddresses {
 			if !skipIP(ip) {
 				ips.Insert(ip.String())
 			}
 		}
-		si.Kubernetes.ControlPlane.IPAddresses = ips.List()
+		si.ControlPlane.IPAddresses = ips.List()
 
 		uris := make([]string, 0, len(cert.URIs))
 		for _, u := range cert.URIs {
 			uris = append(uris, u.String())
 		}
-		si.Kubernetes.ControlPlane.URIs = uris
+		si.ControlPlane.URIs = uris
 	}
 	return &si, nil
 }
