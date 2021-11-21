@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -53,6 +54,17 @@ func run() error {
 	})
 	if err != nil {
 		return err
+	}
+
+	var n2 unstructured.UnstructuredList
+	n2.SetKind("Node")
+	n2.SetAPIVersion("v1")
+	err = c.List(context.TODO(), &n2)
+	if err != nil {
+		panic(err)
+	}
+	for _, n := range n2.Items {
+		fmt.Println(n.GetName())
 	}
 
 	var nodes core.NodeList
