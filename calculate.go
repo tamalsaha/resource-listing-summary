@@ -22,11 +22,6 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
-/*type Stats struct {
-	Count     int
-	Resources core.ResourceList
-}
-*/
 func GetAPIGroups(s labels.Selector) sets.String {
 	g, found := s.RequiresExactMatch("k8s.io/group")
 	if found {
