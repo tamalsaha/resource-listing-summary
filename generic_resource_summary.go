@@ -7,7 +7,7 @@ import (
 )
 
 type ResourceSummarySpec struct {
-	Kubernetes    KubernetesInfo `json:"kubernetes"`
+	Kubernetes    *KubernetesInfo `json:"kubernetes"`
 	APIGroup      string
 	Kind          string
 	TotalResource core.ResourceRequirements

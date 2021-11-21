@@ -4,11 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"k8s.io/client-go/kubernetes"
+
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
-	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/selection"
-
 	"k8s.io/apimachinery/pkg/util/sets"
 
 	core "k8s.io/api/core/v1"
@@ -73,23 +72,6 @@ func main() {
 	}
 }
 
-func GetAPIGroups(s labels.Selector) sets.String {
-	g, found := s.RequiresExactMatch("k8s.io/group")
-	if found {
-		return sets.NewString(g)
-	}
-
-	requirements, selectable := s.Requirements()
-	if selectable {
-		for _, r := range requirements {
-			if r.Key() == "k8s.io/group" && r.Operator() == selection.In {
-				return r.Values()
-			}
-		}
-	}
-	return sets.NewString()
-}
-
 func run() error {
 	_ = clientgoscheme.AddToScheme(scheme)
 	_ = kubedbscheme.AddToScheme(scheme)
@@ -136,5 +118,10 @@ func run() error {
 		fmt.Println(n.Name)
 	}
 
-	return calculate(c, sets.NewString("kubedb.com"))
+	ki, err := GetKubernetesInfo(cfg, kubernetes.NewForConfigOrDie(cfg))
+	if err != nil {
+		return err
+	}
+
+	return calculate(c, ki, sets.NewString("kubedb.com"))
 }

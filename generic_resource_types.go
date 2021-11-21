@@ -3,7 +3,8 @@ package main
 import (
 	core "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
+	"kmodules.xyz/resource-metrics/api"
+	"sigs.k8s.io/cli-utils/pkg/kstatus/status"
 )
 
 type PodRole string
@@ -18,8 +19,8 @@ type GenericResource struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   GenericResourceSpec  `json:"spec,omitempty"`
-	Status runtime.RawExtension `json:"status,omitempty"`
+	Spec   GenericResourceSpec `json:"spec,omitempty"`
+	Status status.Result       `json:"status,omitempty"`
 }
 
 type GenericResourceSpec struct {
@@ -28,7 +29,7 @@ type GenericResourceSpec struct {
 	Kind    string
 
 	Replicas     int64
-	RoleReplicas ReplicaList
+	RoleReplicas api.ReplicaList
 	Mode         string
 
 	TotalResource core.ResourceRequirements
@@ -41,9 +42,9 @@ type GenericResourceSpec struct {
 	// AppResourceLimits core.ResourceList
 	// AppResourceRequests core.ResourceList
 
-	RoleResourceLimits   map[PodRole]core.ResourceList
-	RoleResourceRequests map[PodRole]core.ResourceList
+	RoleResourceLimits   map[api.PodRole]core.ResourceList
+	RoleResourceRequests map[api.PodRole]core.ResourceList
 
 	// https://github.com/kubernetes-sigs/cli-utils/tree/master/pkg/kstatus
-	Status string // kstatus
+	// Status string // kstatus
 }
