@@ -255,18 +255,10 @@ spec:
                         additionalProperties:
                           type: string
                         type: object
-                      labels:
-                        additionalProperties:
-                          type: string
-                        type: object
                     type: object
                   metadata:
                     properties:
                       annotations:
-                        additionalProperties:
-                          type: string
-                        type: object
-                      labels:
                         additionalProperties:
                           type: string
                         type: object
@@ -1708,10 +1700,6 @@ spec:
                     metadata:
                       properties:
                         annotations:
-                          additionalProperties:
-                            type: string
-                          type: object
-                        labels:
                           additionalProperties:
                             type: string
                           type: object

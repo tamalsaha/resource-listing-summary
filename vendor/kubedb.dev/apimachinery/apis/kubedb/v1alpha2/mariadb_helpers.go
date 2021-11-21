@@ -56,25 +56,9 @@ func (m MariaDB) OffshootSelectors() map[string]string {
 }
 
 func (m MariaDB) OffshootLabels() map[string]string {
-	return m.offshootLabels(m.OffshootSelectors(), nil)
-}
-
-func (m MariaDB) PodLabels() map[string]string {
-	return m.offshootLabels(m.OffshootSelectors(), m.Spec.PodTemplate.Labels)
-}
-
-func (m MariaDB) PodControllerLabels() map[string]string {
-	return m.offshootLabels(m.OffshootSelectors(), m.Spec.PodTemplate.Controller.Labels)
-}
-
-func (m MariaDB) offshootLabels(selector, override map[string]string) map[string]string {
-	selector[meta_util.ComponentLabelKey] = ComponentDatabase
-	return meta_util.FilterKeys(kubedb.GroupName, selector, meta_util.OverwriteKeys(nil, m.Labels, override))
-}
-
-func (m MariaDB) ServiceLabels(alias ServiceAlias, extraLabels ...map[string]string) map[string]string {
-	svcTemplate := GetServiceTemplate(m.Spec.ServiceTemplates, alias)
-	return m.offshootLabels(meta_util.OverwriteKeys(m.OffshootSelectors(), extraLabels...), svcTemplate.Labels)
+	out := m.OffshootSelectors()
+	out[meta_util.ComponentLabelKey] = ComponentDatabase
+	return meta_util.FilterKeys(kubedb.GroupName, out, m.Labels)
 }
 
 func (m MariaDB) ResourceFQN() string {
@@ -170,7 +154,9 @@ func (m MariaDB) StatsService() mona.StatsAccessor {
 }
 
 func (m MariaDB) StatsServiceLabels() map[string]string {
-	return m.ServiceLabels(StatsServiceAlias, map[string]string{LabelRole: RoleStats})
+	lbl := meta_util.FilterKeys(kubedb.GroupName, m.OffshootSelectors(), m.Labels)
+	lbl[LabelRole] = RoleStats
+	return lbl
 }
 
 func (m MariaDB) PrimaryServiceDNS() string {

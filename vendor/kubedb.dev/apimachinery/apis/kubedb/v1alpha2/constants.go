@@ -37,12 +37,11 @@ const (
 	DatabasePodPrimary                   = "primary"
 	DatabasePodStandby                   = "standby"
 
-	ComponentDatabase         = "database"
-	ComponentConnectionPooler = "connection-pooler"
-	RoleStats                 = "stats"
-	DefaultStatsPath          = "/metrics"
-	DefaultPasswordLength     = 16
-	HealthCheckInterval       = 10 * time.Second
+	ComponentDatabase     = "database"
+	RoleStats             = "stats"
+	DefaultStatsPath      = "/metrics"
+	DefaultPasswordLength = 16
+	HealthCheckInterval   = 10 * time.Second
 
 	ContainerExporterName = "exporter"
 	LocalHost             = "localhost"
@@ -75,17 +74,13 @@ const (
 	ElasticsearchPerformanceAnalyzerPortName     = "analyzer"
 	ElasticsearchNodeRoleSet                     = "set"
 	ElasticsearchConfigDir                       = "/usr/share/elasticsearch/config"
-	ElasticsearchOpenSearchConfigDir             = "/usr/share/opensearch/config"
 	ElasticsearchSecureSettingsDir               = "/elasticsearch/secure-settings"
 	ElasticsearchTempConfigDir                   = "/elasticsearch/temp-config"
 	ElasticsearchCustomConfigDir                 = "/elasticsearch/custom-config"
 	ElasticsearchDataDir                         = "/usr/share/elasticsearch/data"
-	ElasticsearchOpenSearchDataDir               = "/usr/share/opensearch/data"
 	ElasticsearchOpendistroSecurityConfigDir     = "/usr/share/elasticsearch/plugins/opendistro_security/securityconfig"
-	ElasticsearchOpenSearchSecurityConfigDir     = "/usr/share/opensearch/plugins/opensearch-security/securityconfig"
 	ElasticsearchSearchGuardSecurityConfigDir    = "/usr/share/elasticsearch/plugins/search-guard-%v/sgconfig"
 	ElasticsearchOpendistroReadallMonitorRole    = "readall_and_monitor"
-	ElasticsearchOpenSearchReadallMonitorRole    = "readall_and_monitor"
 	ElasticsearchSearchGuardReadallMonitorRoleV7 = "SGS_READALL_AND_MONITOR"
 	ElasticsearchSearchGuardReadallMonitorRoleV6 = "sg_readall_and_monitor"
 	ElasticsearchStatusGreen                     = "green"
@@ -123,7 +118,6 @@ const (
 	MongoDBKeyFileSecretSuffix    = "-key"
 	MongoDBRootUsername           = "root"
 	MongoDBCustomConfigFile       = "mongod.conf"
-	MongoDBReplicaSetConfig       = "replicaset.json"
 	NodeTypeMongos                = "mongos"
 	NodeTypeShard                 = "shard"
 	NodeTypeConfig                = "configsvr"
@@ -168,13 +162,9 @@ const (
 	// =========================== MySQL Constants ============================
 	MySQLMetricsExporterConfigSecretSuffix = "metrics-exporter-config"
 	MySQLDatabasePortName                  = "db"
-	MySQLRouterReadWritePortName           = "rw"
-	MySQLRouterReadOnlyPortName            = "ro"
 	MySQLPrimaryServicePortName            = "primary"
 	MySQLStandbyServicePortName            = "standby"
 	MySQLDatabasePort                      = 3306
-	MySQLRouterReadWritePort               = 6446
-	MySQLRouterReadOnlyPort                = 6447
 	MySQLGroupComPort                      = 33060
 	MySQLMaxGroupMembers                   = 9
 	// The recommended MySQL server version for group replication (GR)
@@ -189,19 +179,6 @@ const (
 	MySQLTLSConfigTrue       = "true"
 	MySQLTLSConfigFalse      = "false"
 	MySQLTLSConfigPreferred  = "preferred"
-
-	MySQLRouterContainerName           = "mysql-router"
-	MySQLRouterInitScriptDirectoryName = "init-scripts"
-	MySQLRouterInitScriptDirectoryPath = "/scripts"
-	MySQLRouterConfigDirectoryName     = "router-config-secret"
-	MySQLRouterConfigDirectoryPath     = "/etc/mysqlrouter"
-	MySQLRouterTLSDirectoryName        = "router-tls-volume"
-	MySQLRouterTLSDirectoryPath        = "/etc/mysql/certs"
-	MySQLReplicationUser               = "repl"
-
-	MySQLComponentKey    = MySQLKey + "/component"
-	MySQLComponentDB     = "database"
-	MySQLComponentRouter = "router"
 
 	// =========================== PerconaXtraDB Constants ============================
 	PerconaXtraDBClusterRecommendedVersion    = "5.7"
@@ -240,6 +217,7 @@ const (
 	PostgresDatabasePort             = 5432
 	PostgresPodPrimary               = "primary"
 	PostgresPodStandby               = "standby"
+	PostgresLabelRole                = kubedb.GroupName + "/role"
 	EnvPostgresUser                  = "POSTGRES_USER"
 	EnvPostgresPassword              = "POSTGRES_PASSWORD"
 	PostgresCoordinatorContainerName = "pg-coordinator"
@@ -277,9 +255,6 @@ const (
 	ProxySQLDataMountPath          = "/var/lib/proxysql"
 	ProxySQLCustomConfigMountPath  = "/etc/custom-config"
 	// =========================== Redis Constants ============================
-	RedisConfigKey = "redis.conf" // RedisConfigKey is going to create for the customize redis configuration
-	//DefaultConfigKey is going to create for the default redis configuration
-	DefaultConfigKey            = "default.conf"
 	RedisShardKey               = RedisKey + "/shard"
 	RedisDatabasePortName       = "db"
 	RedisPrimaryServicePortName = "primary"
@@ -322,8 +297,6 @@ const (
 	DatabaseAcceptingConnection = "AcceptingConnection"
 	// used for Databases that report status OK (also implies that we can connect to it)
 	DatabaseReady = "Ready"
-	// used for database that reports ok when all the instances are available
-	ServerReady = "ServerReady"
 	// used for Databases that are paused
 	DatabasePaused = "Paused"
 	// used for Databases that are halted
@@ -361,11 +334,12 @@ var (
 	}
 	// CoordinatorDefaultResources must be used for raft backed coordinators to avoid unintended leader switches
 	CoordinatorDefaultResources = core.ResourceRequirements{
-		Requests: core.ResourceList{
-			core.ResourceCPU:    resource.MustParse(".200"),
+		Limits: core.ResourceList{
+			core.ResourceCPU:    resource.MustParse(".500"),
 			core.ResourceMemory: resource.MustParse("256Mi"),
 		},
-		Limits: core.ResourceList{
+		Requests: core.ResourceList{
+			core.ResourceCPU:    resource.MustParse(".500"),
 			core.ResourceMemory: resource.MustParse("256Mi"),
 		},
 	}

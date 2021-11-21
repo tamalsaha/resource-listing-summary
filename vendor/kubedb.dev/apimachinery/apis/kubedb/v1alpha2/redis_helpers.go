@@ -51,35 +51,18 @@ func (r Redis) OffshootName() string {
 	return r.Name
 }
 
-func (r Redis) OffshootSelectors(extraSelectors ...map[string]string) map[string]string {
-	selector := map[string]string{
+func (r Redis) OffshootSelectors() map[string]string {
+	return map[string]string{
 		meta_util.NameLabelKey:      r.ResourceFQN(),
 		meta_util.InstanceLabelKey:  r.Name,
 		meta_util.ManagedByLabelKey: kubedb.GroupName,
 	}
-	return meta_util.OverwriteKeys(selector, extraSelectors...)
 }
 
 func (r Redis) OffshootLabels() map[string]string {
-	return r.offshootLabels(r.OffshootSelectors(), nil)
-}
-
-func (r Redis) PodLabels(extraLabels ...map[string]string) map[string]string {
-	return r.offshootLabels(meta_util.OverwriteKeys(r.OffshootSelectors(), extraLabels...), r.Spec.PodTemplate.Labels)
-}
-
-func (r Redis) PodControllerLabels(extraLabels ...map[string]string) map[string]string {
-	return r.offshootLabels(meta_util.OverwriteKeys(r.OffshootSelectors(), extraLabels...), r.Spec.PodTemplate.Controller.Labels)
-}
-
-func (r Redis) ServiceLabels(alias ServiceAlias, extraLabels ...map[string]string) map[string]string {
-	svcTemplate := GetServiceTemplate(r.Spec.ServiceTemplates, alias)
-	return r.offshootLabels(meta_util.OverwriteKeys(r.OffshootSelectors(), extraLabels...), svcTemplate.Labels)
-}
-
-func (r Redis) offshootLabels(selector, overrides map[string]string) map[string]string {
-	selector[meta_util.ComponentLabelKey] = ComponentDatabase
-	return meta_util.FilterKeys(kubedb.GroupName, selector, meta_util.OverwriteKeys(nil, r.Labels, overrides))
+	out := r.OffshootSelectors()
+	out[meta_util.ComponentLabelKey] = ComponentDatabase
+	return meta_util.FilterKeys(kubedb.GroupName, out, r.Labels)
 }
 
 func (r Redis) ResourceFQN() string {
@@ -115,11 +98,7 @@ func (r Redis) GoverningServiceName() string {
 }
 
 func (r Redis) ConfigSecretName() string {
-	return meta_util.NameWithSuffix(r.OffshootName(), "config")
-}
-
-func (r Redis) CustomConfigSecretName() string {
-	return meta_util.NameWithSuffix(r.OffshootName(), "custom-config")
+	return r.OffshootName()
 }
 
 func (r Redis) BaseNameForShard() string {
@@ -183,7 +162,9 @@ func (r Redis) StatsService() mona.StatsAccessor {
 }
 
 func (r Redis) StatsServiceLabels() map[string]string {
-	return r.ServiceLabels(StatsServiceAlias, map[string]string{LabelRole: RoleStats})
+	lbl := meta_util.FilterKeys(kubedb.GroupName, r.OffshootSelectors(), r.Labels)
+	lbl[LabelRole] = RoleStats
+	return lbl
 }
 
 func (r *Redis) SetDefaults(topology *core_util.Topology) {
