@@ -11,8 +11,8 @@ require (
 	k8s.io/klog/v2 v2.8.0
 	kmodules.xyz/client-go v0.0.0-20211119042047-bbc619ee4c49
 	kmodules.xyz/resource-metrics v0.0.5
-	kubedb.dev/apimachinery v0.21.1-0.20210915153024-84659c4a8fca
-	kubedb.dev/installer v0.17.2-0.20210928191619-37db9b158afd
+	kubedb.dev/apimachinery v0.23.0
+	kubedb.dev/installer v0.17.2-0.20211120210545-56cdf5f856d5
 	kubedb.dev/schema-manager v0.0.0-20211110061305-8b9c033d338c
 	kubevault.dev/apimachinery v0.5.1
 	sigs.k8s.io/controller-runtime v0.9.0
@@ -92,8 +92,8 @@ require (
 	k8s.io/utils v0.0.0-20210802155522-efc7438f0176 // indirect
 	kmodules.xyz/custom-resources v0.0.0-20211007080833-72bd9e8cae6e // indirect
 	kmodules.xyz/monitoring-agent-api v0.0.0-20210928135619-38ca075a2dbd // indirect
-	kmodules.xyz/objectstore-api v0.0.0-20210618005912-71f8a80f48f9 // indirect
-	kmodules.xyz/offshoot-api v0.0.0-20210829122105-6f4d481b0c61 // indirect
+	kmodules.xyz/objectstore-api v0.0.0-20210928135706-fdf68f88ea6e // indirect
+	kmodules.xyz/offshoot-api v0.0.0-20211103060642-3e217667cf41 // indirect
 	sigs.k8s.io/kustomize/api v0.8.8 // indirect
 	sigs.k8s.io/kustomize/kyaml v0.10.17 // indirect
 	sigs.k8s.io/structured-merge-diff/v4 v4.1.2 // indirect
