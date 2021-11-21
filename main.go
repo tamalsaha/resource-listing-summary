@@ -1,8 +1,12 @@
 package main
 
 import (
+	"context"
+	"fmt"
+
 	"k8s.io/apimachinery/pkg/util/sets"
 
+	core "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	"k8s.io/klog/v2/klogr"
@@ -49,6 +53,15 @@ func run() error {
 	})
 	if err != nil {
 		return err
+	}
+
+	var nodes core.NodeList
+	err = c.List(context.TODO(), &nodes)
+	if err != nil {
+		panic(err)
+	}
+	for _, n := range nodes.Items {
+		fmt.Println(n.Name)
 	}
 
 	return calculate(cfg, sets.NewString("kubedb.com"))
