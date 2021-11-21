@@ -3,7 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/apimachinery/pkg/selection"
 
 	"k8s.io/apimachinery/pkg/util/sets"
 
@@ -25,9 +29,65 @@ var (
 )
 
 func main() {
-	if err := run(); err != nil {
+	/*
+	   k8s.io/group: apiextensions.k8s.io
+	   k8s.io/kind: CustomResourceDefinition
+	   k8s.io/resource: customresourcedefinitions
+	   k8s.io/version: v1
+
+	*/
+	ls := metav1.LabelSelector{
+		//MatchLabels: map[string]string{
+		//	"k8s.io/group": "apps",
+		//},
+		MatchExpressions: []metav1.LabelSelectorRequirement{
+			{
+				Key:      "k8s.io/group",
+				Operator: metav1.LabelSelectorOpIn,
+				Values:   []string{"apps", "kubedb.com"},
+			},
+		},
+	}
+	s, err := metav1.LabelSelectorAsSelector(&ls)
+	if err != nil {
 		panic(err)
 	}
+	g, found := s.RequiresExactMatch("k8s.io/group")
+	fmt.Println("group = ", g)
+	fmt.Println("found = ", found)
+
+	requirements, selectable := s.Requirements()
+	if selectable {
+		fmt.Println("selectable")
+	}
+	for _, r := range requirements {
+		fmt.Println("key = ", r.Key())
+		fmt.Println("op = ", r.Operator())
+		fmt.Println("values = ", r.Values().List())
+	}
+
+	fmt.Println(GetAPIGroups(s).List())
+
+	//if err := run(); err != nil {
+	//	panic(err)
+	//}
+}
+
+func GetAPIGroups(s labels.Selector) sets.String {
+	g, found := s.RequiresExactMatch("k8s.io/group")
+	if found {
+		return sets.NewString(g)
+	}
+
+	requirements, selectable := s.Requirements()
+	if selectable {
+		for _, r := range requirements {
+			if r.Key() == "k8s.io/group" && r.Operator() == selection.In {
+				return r.Values()
+			}
+		}
+	}
+	return sets.NewString()
 }
 
 func run() error {
