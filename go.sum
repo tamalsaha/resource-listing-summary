@@ -1143,8 +1143,9 @@ kmodules.xyz/openshift v0.0.0-20210618001443-f2507caa512f/go.mod h1:8E5ckbd1KMNm
 kmodules.xyz/prober v0.0.0-20210618020259-5836fb959027/go.mod h1:H4NcvS1RQxeXtQONALbU6r9OT3Xa7cMhfamX/k9t9wo=
 kmodules.xyz/resource-metadata v0.6.4/go.mod h1:KWf68Ado/hgYpb/msYNvhYSLWvS/bJcVAAHO1/q9nNg=
 kmodules.xyz/resource-metrics v0.0.3/go.mod h1:6Dv63HDgp83DhA+lZNB7GIQR6PLjNrYW6ghQKioQzII=
-kmodules.xyz/resource-metrics v0.0.5 h1:an1eaxw8mWX5RfujUMTTkJPGiMlQQUDzT6aveSGNAq8=
 kmodules.xyz/resource-metrics v0.0.5/go.mod h1:6Dv63HDgp83DhA+lZNB7GIQR6PLjNrYW6ghQKioQzII=
+kmodules.xyz/resource-metrics v0.0.6 h1:dMI2oIWu+3GIcjI/ZxpBFi8GpHg56P81WNbA0EdZbIY=
+kmodules.xyz/resource-metrics v0.0.6/go.mod h1:M7rWuo2qh3BpHhogiEVPnvGY9Xx4Pfygqn1Rex8YbgM=
 kmodules.xyz/webhook-runtime v0.0.0-20210928141616-7f73c2ab318a/go.mod h1:MFZFmJk9IXNHwq8JlF/mukwBDbopFQj4swaB2MWHc/U=
 kubedb.dev/apimachinery v0.23.0 h1:K0dKXx7XJINv3Py75D/up6V3zl8XfX/e/rvspNejXNA=
 kubedb.dev/apimachinery v0.23.0/go.mod h1:x8UBaJPIBCD6S58VQ+38+QxFUXCYdvFrmP9FnOuPOaI=

@@ -8,7 +8,7 @@ require (
 	k8s.io/client-go v0.21.1
 	k8s.io/klog/v2 v2.9.0
 	kmodules.xyz/client-go v0.0.0-20211119042047-bbc619ee4c49
-	kmodules.xyz/resource-metrics v0.0.5
+	kmodules.xyz/resource-metrics v0.0.6
 	kubedb.dev/apimachinery v0.23.0
 	kubedb.dev/schema-manager v0.0.0-20211110061305-8b9c033d338c
 	kubevault.dev/apimachinery v0.5.1

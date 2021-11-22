@@ -504,7 +504,7 @@ kmodules.xyz/objectstore-api/api/v1
 # kmodules.xyz/offshoot-api v0.0.0-20211103060642-3e217667cf41
 ## explicit; go 1.15
 kmodules.xyz/offshoot-api/api/v1
-# kmodules.xyz/resource-metrics v0.0.5
+# kmodules.xyz/resource-metrics v0.0.6
 ## explicit; go 1.17
 kmodules.xyz/resource-metrics
 kmodules.xyz/resource-metrics/api
